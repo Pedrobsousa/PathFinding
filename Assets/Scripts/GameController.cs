@@ -36,6 +36,8 @@ public class GameController : MonoBehaviour
                 Node goalNode = graph.nodes[goalX, goalY];
 
                 pathFinder.Init(graph, graphView, startNode, goalNode);
+                //Start Search - add delay here 
+                StartCoroutine(pathFinder.SearchRoutine(0.05f));//1/10 of a sec def
             }
             else
             {

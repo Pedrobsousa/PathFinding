@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tile: {fileID: 3409335933606995600}
-  borderSize: 0.1
+  borderSize: 0.078
 --- !u!1001 &6661256926347788185
 PrefabInstance:
   m_ObjectHideFlags: 0
