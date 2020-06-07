@@ -8,7 +8,7 @@ using UnityEngine;
 public class GraphView : MonoBehaviour
 {
     public GameObject nodeViewPrefab;
-
+    public NodeView[,] nodeViews;//Identify nodeViews to color
     public Color baseColor = Color.white;
     public Color wallColor = Color.black;
 
@@ -17,7 +17,10 @@ public class GraphView : MonoBehaviour
         if(graph == null)
         {
             Debug.LogWarning("GRAPHVIEW No Graph to initialize");
+            return;
         }
+
+        nodeViews = new NodeView[graph.Width, graph.Height];
 
         //In graph we create nodes[] based on the MapData
         foreach(Node n in graph.nodes)
@@ -28,7 +31,8 @@ public class GraphView : MonoBehaviour
             if(nodeView != null)
             {
                 nodeView.Init(n);
-
+                //Allows to see each Node => NodeView
+                nodeViews[n.xIndex, n.yIndex] = nodeView;//Add NodeView to Array using n
                 if(n.nodeType == NodeType.Blocked)
                 {
                     nodeView.ColorNode(wallColor);
@@ -39,6 +43,24 @@ public class GraphView : MonoBehaviour
                 }
             }
 
+        }
+    }
+
+
+    //Color multiple nodes at once
+    public void ColorNodes(List<Node> nodes, Color color)
+    {
+        foreach (Node n in nodes)
+        {
+            if (n != null)
+            {
+                NodeView nodeView = nodeViews[n.xIndex, n.yIndex];
+
+                if (nodeView != null)
+                {
+                    nodeView.ColorNode(color);
+                }
+            }
         }
     }
 }

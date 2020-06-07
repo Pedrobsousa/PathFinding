@@ -16,6 +16,8 @@ public class Graph : MonoBehaviour
     int[,] m_mapData;
     int m_width;
     int m_height;
+    public int Height { get { return m_height; } }//Expose map dimensions
+    public int Width { get { return m_width; } }//Read only
 
     //Run only once for each Graph
     public void Init(int[,] mapData)
@@ -47,5 +49,10 @@ public class Graph : MonoBehaviour
             }
         }
 
+    }
+
+    public bool IsWithinBounds(int x, int y)
+    {
+        return (x >= 0 && x < m_width && y >= 0 && y < m_height);
     }
 }
