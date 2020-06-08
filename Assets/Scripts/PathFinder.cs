@@ -125,6 +125,8 @@ public class PathFinder : MonoBehaviour
 
                 ExpandFrontier(currentNode);
                 DisplayColors();
+                if (m_graphView) { m_graphView.ShowNodeArrows(m_frontierNodes.ToList()); }
+                
 
                 yield return new WaitForSeconds(timeStep);
             }

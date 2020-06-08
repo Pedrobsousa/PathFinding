@@ -486,6 +486,7 @@ MonoBehaviour:
   frontierColor: {r: 1, g: 0, b: 1, a: 1}
   exploredColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   pathColor: {r: 0, g: 0, b: 1, a: 1}
+  isComplete: 0
 --- !u!4 &2063338569
 Transform:
   m_ObjectHideFlags: 0

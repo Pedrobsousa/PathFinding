@@ -14,7 +14,7 @@ public class GraphView : MonoBehaviour
 
     public void Init(Graph graph)
     {
-        if(graph == null)
+        if (graph == null)
         {
             Debug.LogWarning("GRAPHVIEW No Graph to initialize");
             return;
@@ -23,17 +23,17 @@ public class GraphView : MonoBehaviour
         nodeViews = new NodeView[graph.Width, graph.Height];
 
         //In graph we create nodes[] based on the MapData
-        foreach(Node n in graph.nodes)
+        foreach (Node n in graph.nodes)
         {
             GameObject instance = Instantiate(nodeViewPrefab, Vector3.zero, Quaternion.identity);
             NodeView nodeView = instance.GetComponent<NodeView>();//from prefab get Nodeview ref
 
-            if(nodeView != null)
+            if (nodeView != null)
             {
                 nodeView.Init(n);
                 //Allows to see each Node => NodeView
                 nodeViews[n.xIndex, n.yIndex] = nodeView;//Add NodeView to Array using n
-                if(n.nodeType == NodeType.Blocked)
+                if (n.nodeType == NodeType.Blocked)
                 {
                     nodeView.ColorNode(wallColor);
                 }
@@ -63,4 +63,26 @@ public class GraphView : MonoBehaviour
             }
         }
     }
+
+    public void ShowNodeArrows(Node node)
+    {
+        if (node != null)
+        {
+            NodeView nodeView = nodeViews[node.xIndex, node.yIndex];
+            if (nodeView != null)
+            {
+                nodeView.ShowArrow();
+            }
+        }
+    }
+    //Overloaded takes List<Node>
+    public void ShowNodeArrows(List<Node> nodes)
+    {
+        foreach (Node n in nodes)
+        {
+            ShowNodeArrows(n);
+        }
+    }
+    
+
 }
