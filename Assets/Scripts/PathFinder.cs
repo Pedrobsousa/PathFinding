@@ -21,8 +21,13 @@ public class PathFinder : MonoBehaviour
     public Color pathColor = Color.blue;
     #endregion
 
+    public bool exitOnGoal = true;
     public bool isComplete = false;//if the search is done
+
     int m_iterations = 0;//iterations used to explore
+    public bool showIterations = false;//toggle diagnostics
+    public bool showArrows = true;
+    public bool showColors = true;
 
     public void Init(Graph graph, GraphView graphView, Node start, Node goal)
     {
@@ -44,7 +49,6 @@ public class PathFinder : MonoBehaviour
         m_graphView = graphView;
         m_startNode = start;
         m_goalNode = goal;
-
 
         DisplayColors(graphView, start, goal);
 
@@ -77,7 +81,9 @@ public class PathFinder : MonoBehaviour
     {
         if (graphView == null || start == null || goal == null)
         {
+            Debug.Log("DisplayColors returned");
             return;
+            
         }
 
         if (m_frontierNodes != null)
@@ -88,6 +94,14 @@ public class PathFinder : MonoBehaviour
         if (m_exploredNodes != null)
         {
             graphView.ColorNodes(m_exploredNodes, exploredColor);
+        }
+
+        //Color Path 
+        if (m_pathNodes != null && m_pathNodes.Count > 0)
+        {
+            Debug.Log("Coloring Path");
+            graphView.ColorNodes(m_pathNodes, pathColor);
+
         }
 
         NodeView startNodeView = graphView.nodeViews[start.xIndex, start.yIndex];
@@ -106,14 +120,12 @@ public class PathFinder : MonoBehaviour
     }
 
     //Set up Delay for search
-
-    public IEnumerator SearchRoutine(float timeStep = 0.1f)
+    public IEnumerator SearchRoutine(float timeStep = 0f)
     {
         yield return null;
-
         while (!isComplete)
         {
-            if(m_frontierNodes.Count > 0)//Make sure we have a Node in Queue
+            if (m_frontierNodes.Count > 0)//Make sure we have a Node in Queue
             {
                 Node currentNode = m_frontierNodes.Dequeue();
                 m_iterations++;
@@ -122,22 +134,29 @@ public class PathFinder : MonoBehaviour
                 {
                     m_exploredNodes.Add(currentNode);
                 }
-
                 ExpandFrontier(currentNode);
-                DisplayColors();
-                if (m_graphView) { m_graphView.ShowNodeArrows(m_frontierNodes.ToList()); }
-                
-
-                yield return new WaitForSeconds(timeStep);
-            }
-            else//No more Frontier Nodes
-            {
-                Debug.LogWarning("DONE SEARCH");
-                isComplete = true;
+                //When we find the goalNode get path
+                if (m_frontierNodes.Contains(m_goalNode))
+                {
+                    //Debug.LogError("We found goal Node");
+                    m_pathNodes = GetPathNodes(m_goalNode);
+                    if (exitOnGoal) { isComplete = true; }
+                }
+                //show diagnostics (colors / arrows)
+                if (showIterations)
+                {
+                    ShowDiagnostics();
+                    yield return new WaitForSeconds(timeStep);
+                }
+                else//No more Frontier Nodes
+                {
+                    Debug.LogWarning("DONE SEARCH");
+                    isComplete = true;
+                }
             }
         }
+        ShowDiagnostics();
     }
-
     //Add Neighbors to Frontier Queue of node and set up trail back
     void ExpandFrontier(Node node)
     {
@@ -153,6 +172,48 @@ public class PathFinder : MonoBehaviour
                     m_frontierNodes.Enqueue(node.neighbors[i]);
                 }
             }
+        }
+    }
+
+    //Get List of Path Node
+    List<Node> GetPathNodes(Node endNode)
+    {
+        List<Node> path = new List<Node>();
+
+        if(endNode == null)
+        {
+            return path;
+        }
+        //Start by adding "goal node"
+        path.Add(endNode);
+        Node currentNode = endNode.previous;//Access previous Node for trail
+        //Travel backward through Graph
+        while(currentNode != null)
+        {
+            //Insert used instead to add node to front
+            path.Insert(0, currentNode);
+            currentNode = currentNode.previous;
+        }
+        Debug.Log("Returning path");
+        return path;
+    }
+
+
+    void ShowDiagnostics()
+    {
+        if (showColors)
+        {
+            DisplayColors();
+        }
+
+        if (m_graphView && showArrows)
+        {
+            m_graphView.ShowNodeArrows(m_frontierNodes.ToList());
+            if (m_frontierNodes.Contains(m_goalNode))
+            {
+                m_graphView.ShowNodeArrows(m_pathNodes);
+            }
+            
         }
     }
 }
