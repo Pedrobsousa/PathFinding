@@ -68,9 +68,145 @@ public class PathFinder : MonoBehaviour
         //Reset
         isComplete = false;
         m_iterations = 0;
+        m_startNode.distanceTravelled = 0;//Replace infinity with 0 as we explore
     }
 
+
+    //Set up search with optional delay
+    public IEnumerator SearchRoutine(float timeStep = 0f)
+    {
+        yield return null;
+        while (!isComplete)
+        {
+            if (m_frontierNodes.Count > 0)//Make sure we have a Node in Queue
+            {
+                Node currentNode = m_frontierNodes.Dequeue();
+                m_iterations++;
+                //Transfer Node to explored List
+                if (!m_exploredNodes.Contains(currentNode))
+                {
+                    m_exploredNodes.Add(currentNode);
+                }
+
+                #region BREADTH FRONTIER CALL (BOTTOM OF PAGE)
+                //ExpandFrontierBreadth(currentNode);
+                #endregion
+
+                //Dijkstra
+                ExpandFrontierDijkstra(currentNode);
+
+                //When we find the goalNode get path
+                if (m_frontierNodes.Contains(m_goalNode))
+                {
+                    //Debug.LogError("We found goal Node");
+                    m_pathNodes = GetPathNodes(m_goalNode);
+                    if (exitOnGoal) {
+                        ShowDiagnostics();
+                        isComplete = true; 
+                    }
+                }
+                //show diagnostics (colors / arrows)
+                if (showIterations)
+                {
+                    ShowDiagnostics();
+                    yield return new WaitForSeconds(timeStep);
+                }
+
+            }
+
+            else//No more Frontier Nodes
+            {
+                Debug.LogWarning("DONE SEARCH");
+                isComplete = true;
+            }
+        }
+        ShowDiagnostics();
+        
+    }
+
+    //Get List of Path Node
+    List<Node> GetPathNodes(Node endNode)
+    {
+        List<Node> path = new List<Node>();
+
+        if(endNode == null)
+        {
+            return path;
+        }
+        //Start by adding "goal node"
+        path.Add(endNode);
+        Node currentNode = endNode.previous;//Access previous Node for trail
+        //Travel backward through Graph
+        while(currentNode != null)
+        {
+            //Insert used instead to add node to front
+            path.Insert(0, currentNode);
+            currentNode = currentNode.previous;
+        }
+        Debug.Log("Returning path");
+        return path;
+    }
+
+    //Based on Dijkstra's algorithm
+    void ExpandFrontierDijkstra(Node node)
+    {
+        if(node != null)
+        {
+            for (int i = 0; i < node.neighbors.Count; i++)
+            {
+                if(!m_exploredNodes.Contains(node.neighbors[i]))
+                {
+                    //Distance between neighbor of the node
+                    float distanceToNeighbor = m_graph.GetNodeDistance(node, node.neighbors[i]);
+                    float newDistanceTravelled = distanceToNeighbor + node.distanceTravelled;
+
+                    //Only if never travelled to(still has Infinity as distanceTravelled)
+                    //or the new distance travelled is shorter than the existing one in neighbor
+                    //Only re route the previous node to current if we found a shorter path
+                    if (float.IsPositiveInfinity(node.neighbors[i].distanceTravelled) ||
+                        newDistanceTravelled < node.neighbors[i].distanceTravelled) 
+                    {
+                        node.neighbors[i].previous = node;
+                        node.neighbors[i].distanceTravelled = newDistanceTravelled;
+                       
+                    }
+
+                    if (!m_frontierNodes.Contains(node.neighbors[i]))
+                    {
+                        m_frontierNodes.Enqueue(node.neighbors[i]);
+                    }
+                        
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
     //Diagnostic Tool - Paints Special Nodes
+    void ShowDiagnostics()
+    {
+        if (showColors)
+        {
+            DisplayColors();
+            Debug.Log("Diagnostics");
+        }
+
+        if (m_graphView != null && showArrows)
+        {
+            m_graphView.ShowNodeArrows(m_frontierNodes.ToList());
+            if (m_frontierNodes.Contains(m_goalNode))
+            {
+                m_graphView.ShowNodeArrows(m_pathNodes);
+            }
+            
+        }
+    }
 
     void DisplayColors()
     {
@@ -83,7 +219,7 @@ public class PathFinder : MonoBehaviour
         {
             Debug.Log("DisplayColors returned");
             return;
-            
+
         }
 
         if (m_frontierNodes != null)
@@ -119,101 +255,25 @@ public class PathFinder : MonoBehaviour
         }
     }
 
-    //Set up Delay for search
-    public IEnumerator SearchRoutine(float timeStep = 0f)
-    {
-        yield return null;
-        while (!isComplete)
-        {
-            if (m_frontierNodes.Count > 0)//Make sure we have a Node in Queue
-            {
-                Node currentNode = m_frontierNodes.Dequeue();
-                m_iterations++;
-                //Transfer Node to explored List
-                if (!m_exploredNodes.Contains(currentNode))
-                {
-                    m_exploredNodes.Add(currentNode);
-                }
-                ExpandFrontier(currentNode);
-                //When we find the goalNode get path
-                if (m_frontierNodes.Contains(m_goalNode))
-                {
-                    //Debug.LogError("We found goal Node");
-                    m_pathNodes = GetPathNodes(m_goalNode);
-                    if (exitOnGoal) { isComplete = true; }
-                }
-                //show diagnostics (colors / arrows)
-                if (showIterations)
-                {
-                    ShowDiagnostics();
-                    yield return new WaitForSeconds(timeStep);
-                }
-                else//No more Frontier Nodes
-                {
-                    Debug.LogWarning("DONE SEARCH");
-                    isComplete = true;
-                }
-            }
-        }
-        ShowDiagnostics();
-    }
-    //Add Neighbors to Frontier Queue of node and set up trail back
-    void ExpandFrontier(Node node)
-    {
-        if(node != null)
-        {
-            for (int i = 0; i < node.neighbors.Count; i++)
-            {
-                if(!m_exploredNodes.Contains(node.neighbors[i]) 
-                   && !m_frontierNodes.Contains(node.neighbors[i]))
-                {
-                    //BreadCrumb Trail to previous path of nodes
-                    node.neighbors[i].previous = node;
-                    m_frontierNodes.Enqueue(node.neighbors[i]);
-                }
-            }
-        }
-    }
-
-    //Get List of Path Node
-    List<Node> GetPathNodes(Node endNode)
-    {
-        List<Node> path = new List<Node>();
-
-        if(endNode == null)
-        {
-            return path;
-        }
-        //Start by adding "goal node"
-        path.Add(endNode);
-        Node currentNode = endNode.previous;//Access previous Node for trail
-        //Travel backward through Graph
-        while(currentNode != null)
-        {
-            //Insert used instead to add node to front
-            path.Insert(0, currentNode);
-            currentNode = currentNode.previous;
-        }
-        Debug.Log("Returning path");
-        return path;
-    }
 
 
-    void ShowDiagnostics()
-    {
-        if (showColors)
-        {
-            DisplayColors();
-        }
-
-        if (m_graphView && showArrows)
-        {
-            m_graphView.ShowNodeArrows(m_frontierNodes.ToList());
-            if (m_frontierNodes.Contains(m_goalNode))
-            {
-                m_graphView.ShowNodeArrows(m_pathNodes);
-            }
-            
-        }
-    }
+    #region BREADTH EXPAND FRONTIER
+    ////Add Neighbors to Frontier Queue of node and set up trail back
+    //void ExpandFrontierBreadth(Node node)
+    //{
+    //    if(node != null)
+    //    {
+    //        for (int i = 0; i < node.neighbors.Count; i++)
+    //        {
+    //            if(!m_exploredNodes.Contains(node.neighbors[i]) 
+    //               && !m_frontierNodes.Contains(node.neighbors[i]))
+    //            {
+    //                //BreadCrumb Trail to previous path of nodes
+    //                node.neighbors[i].previous = node;
+    //                m_frontierNodes.Enqueue(node.neighbors[i]);
+    //            }
+    //        }
+    //    }
+    //}
+    #endregion
 }

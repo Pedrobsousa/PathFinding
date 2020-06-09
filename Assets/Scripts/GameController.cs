@@ -37,11 +37,7 @@ public class GameController : MonoBehaviour
 
                 pathFinder.Init(graph, graphView, startNode, goalNode);
                 //Start Search - add delay here 
-                StartCoroutine(pathFinder.SearchRoutine(0.05f));//1/10 of a sec def
-            }
-            else
-            {
-                Debug.LogWarning("ESSENTIAL NODES OUT OF BOUNDS");
+                StartCoroutine(pathFinder.SearchRoutine(Mathf.Epsilon));//1/10 of a sec def
             }
         }
     }

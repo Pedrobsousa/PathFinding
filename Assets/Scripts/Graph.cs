@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -101,5 +102,21 @@ public class Graph : MonoBehaviour
     List<Node> GetNeighbors(int x, int y)
     {
         return GetNeighbors(x, y, nodes, allDirections);
+    }
+
+    //Return distance btw Nodes. Aplicable to neighboors or any
+    public float GetNodeDistance(Node source, Node target)
+    {
+        //Abs value in case we get a negative number( target behind it)
+        int dx = Mathf.Abs(source.xIndex - target.xIndex);
+        int dy = Mathf.Abs(source.yIndex - target.yIndex);
+        //Shorter/Longer of 2 Deltas
+        int min = Mathf.Min(dx, dy);
+        int max = Mathf.Max(dx, dy);
+        //Diagonal takes less steps but 1.4(distance btw Node diag) mov cost
+        int diagonalSteps = min;
+        int straightSteps = max - min;
+
+        return (1.4f * diagonalSteps + straightSteps);
     }
 }
