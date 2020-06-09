@@ -488,7 +488,7 @@ MonoBehaviour:
   pathColor: {r: 0, g: 0, b: 1, a: 1}
   exitOnGoal: 1
   isComplete: 0
-  showIterations: 0
+  showIterations: 1
   showArrows: 1
   showColors: 1
 --- !u!4 &2063338569

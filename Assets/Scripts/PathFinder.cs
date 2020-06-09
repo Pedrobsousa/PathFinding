@@ -9,7 +9,7 @@ public class PathFinder : MonoBehaviour
     Graph m_graph;
     GraphView m_graphView;
 
-    Queue<Node> m_frontierNodes;
+    PriorityQueue<Node> m_frontierNodes;
     List<Node> m_exploredNodes;//After frontier nodes
     List<Node> m_pathNodes;//path to goal nodes
 
@@ -52,7 +52,7 @@ public class PathFinder : MonoBehaviour
 
         DisplayColors(graphView, start, goal);
 
-        m_frontierNodes = new Queue<Node>();
+        m_frontierNodes = new PriorityQueue<Node>();
         m_frontierNodes.Enqueue(start);
         m_exploredNodes = new List<Node>();
         m_pathNodes = new List<Node>();
@@ -173,6 +173,7 @@ public class PathFinder : MonoBehaviour
 
                     if (!m_frontierNodes.Contains(node.neighbors[i]))
                     {
+                        node.neighbors[i].priority = (int)node.neighbors[i].distanceTravelled;
                         m_frontierNodes.Enqueue(node.neighbors[i]);
                     }
                         

@@ -79,7 +79,7 @@ public class Graph : MonoBehaviour
     {
         return (x >= 0 && x < m_width && y >= 0 && y < m_height);
     }
-
+    //Check neighbors for corners. if they have 2 blocked neighbors? or use collider on intersection?
     List<Node> GetNeighbors(int x, int y, Node[,] nodeArray, Vector2[] directions)
     {
         List<Node> neighborNodes = new List<Node>();
