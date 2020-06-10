@@ -10,6 +10,7 @@ public class GraphView : MonoBehaviour
     public NodeView[,] nodeViews;//Identify nodeViews to color
     public Color baseColor = Color.white;
     public Color wallColor = Color.black;
+    public Color liteTerrainColor = Color.yellow;
 
     public void Init(Graph graph)
     {
@@ -35,6 +36,10 @@ public class GraphView : MonoBehaviour
                 if (n.nodeType == NodeType.Blocked)
                 {
                     nodeView.ColorNode(wallColor);
+                }
+                else if (n.nodeType == NodeType.LightTerrain)
+                {
+                    nodeView.ColorNode(liteTerrainColor);
                 }
                 else
                 {

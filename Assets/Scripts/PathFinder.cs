@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class PathFinder : MonoBehaviour
@@ -24,7 +23,6 @@ public class PathFinder : MonoBehaviour
     public bool exitOnGoal = true;
     public bool isComplete = false;//if the search is done
 
-    int m_iterations = 0;//iterations used to explore
     public bool showIterations = false;//toggle diagnostics
     public bool showArrows = true;
     public bool showColors = true;
@@ -49,7 +47,7 @@ public class PathFinder : MonoBehaviour
         m_graphView = graphView;
         m_startNode = start;
         m_goalNode = goal;
-
+        //Replace with basic Method to color start and goal
         DisplayColors(graphView, start, goal);
 
         m_frontierNodes = new PriorityQueue<Node>();
@@ -67,7 +65,6 @@ public class PathFinder : MonoBehaviour
 
         //Reset
         isComplete = false;
-        m_iterations = 0;
         m_startNode.distanceTravelled = 0;//Replace infinity with 0 as we explore
     }
 
@@ -81,16 +78,11 @@ public class PathFinder : MonoBehaviour
             if (m_frontierNodes.Count > 0)//Make sure we have a Node in Queue
             {
                 Node currentNode = m_frontierNodes.Dequeue();
-                m_iterations++;
                 //Transfer Node to explored List
                 if (!m_exploredNodes.Contains(currentNode))
                 {
                     m_exploredNodes.Add(currentNode);
                 }
-
-                #region BREADTH FRONTIER CALL (BOTTOM OF PAGE)
-                //ExpandFrontierBreadth(currentNode);
-                #endregion
 
                 //Dijkstra
                 ExpandFrontierDijkstra(currentNode);
@@ -111,9 +103,7 @@ public class PathFinder : MonoBehaviour
                     ShowDiagnostics();
                     yield return new WaitForSeconds(timeStep);
                 }
-
             }
-
             else//No more Frontier Nodes
             {
                 Debug.LogWarning("DONE SEARCH");
@@ -121,7 +111,6 @@ public class PathFinder : MonoBehaviour
             }
         }
         ShowDiagnostics();
-        
     }
 
     //Get List of Path Node
@@ -143,7 +132,7 @@ public class PathFinder : MonoBehaviour
             path.Insert(0, currentNode);
             currentNode = currentNode.previous;
         }
-        Debug.Log("Returning path");
+        //Debug.Log("Returning path");
         return path;
     }
 
@@ -156,9 +145,9 @@ public class PathFinder : MonoBehaviour
             {
                 if(!m_exploredNodes.Contains(node.neighbors[i]))
                 {
-                    //Distance between neighbor of the node
-                    float distanceToNeighbor = m_graph.GetNodeDistance(node, node.neighbors[i]);
-                    float newDistanceTravelled = distanceToNeighbor + node.distanceTravelled;
+                    //Distance between neighbor of the node                                         !!!
+                    float distanceToNeighbor = m_graph.GetNodeDistance(node, node.neighbors[i]);//Add move nodetype as move cost
+                    float newDistanceTravelled = distanceToNeighbor + node.distanceTravelled; //+ (int)node.nodeType;
 
                     //Only if never travelled to(still has Infinity as distanceTravelled)
                     //or the new distance travelled is shorter than the existing one in neighbor
@@ -173,7 +162,7 @@ public class PathFinder : MonoBehaviour
 
                     if (!m_frontierNodes.Contains(node.neighbors[i]))
                     {
-                        node.neighbors[i].priority = (int)node.neighbors[i].distanceTravelled;
+                        node.neighbors[i].priority = node.neighbors[i].distanceTravelled;
                         m_frontierNodes.Enqueue(node.neighbors[i]);
                     }
                         
@@ -195,7 +184,7 @@ public class PathFinder : MonoBehaviour
         if (showColors)
         {
             DisplayColors();
-            Debug.Log("Diagnostics");
+            //Debug.Log("Diagnostics");
         }
 
         if (m_graphView != null && showArrows)
@@ -242,39 +231,13 @@ public class PathFinder : MonoBehaviour
         }
 
         NodeView startNodeView = graphView.nodeViews[start.xIndex, start.yIndex];
-
-        if (startNodeView != null)
+        NodeView goalNodeView = graphView.nodeViews[goal.xIndex, goal.yIndex];
+        if (startNodeView != null && goalNodeView != null)
         {
             startNodeView.ColorNode(startColor);
-        }
-
-        NodeView goalNodeView = graphView.nodeViews[goal.xIndex, goal.yIndex];
-
-        if (goalNodeView != null)
-        {
             goalNodeView.ColorNode(goalColor);
         }
     }
 
 
-
-    #region BREADTH EXPAND FRONTIER
-    ////Add Neighbors to Frontier Queue of node and set up trail back
-    //void ExpandFrontierBreadth(Node node)
-    //{
-    //    if(node != null)
-    //    {
-    //        for (int i = 0; i < node.neighbors.Count; i++)
-    //        {
-    //            if(!m_exploredNodes.Contains(node.neighbors[i]) 
-    //               && !m_frontierNodes.Contains(node.neighbors[i]))
-    //            {
-    //                //BreadCrumb Trail to previous path of nodes
-    //                node.neighbors[i].previous = node;
-    //                m_frontierNodes.Enqueue(node.neighbors[i]);
-    //            }
-    //        }
-    //    }
-    //}
-    #endregion
 }

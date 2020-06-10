@@ -7,11 +7,10 @@ public class MapData : MonoBehaviour
 {
     //                          [0,5]...[10,5]
     //Dimensions of Map         [0,0]...[10,0]  [width, height]
-
     public int height = 5;
     public int width = 10;
 
-    //Update to use Resources methods for Unity
+    //Update to use Resources methods for Unity and/or use images/texture for map
     public TextAsset textAsset;
 
     #region #!!TEXTPARSING!!
@@ -78,6 +77,7 @@ public class MapData : MonoBehaviour
             }
         }
 
+        #region HARDCODED BLOCKED VALUES
         ////Hard coded blocked Nodes
 
         //map[1, 0] = 1;
@@ -99,6 +99,8 @@ public class MapData : MonoBehaviour
 
         //map[3, 4] = 1;
         //map[8, 4] = 1;
+        #endregion
+
 
         return map;
     }

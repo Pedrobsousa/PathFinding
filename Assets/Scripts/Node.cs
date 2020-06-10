@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum NodeType { Open = 0, Blocked = 1} //Store Different types of Nodes, acessible to all Objects
+public enum NodeType { Open = 0, Blocked = 1, LightTerrain = 2} //Store Different types of Nodes, acessible to all Objects
 
 
 //It is Necessary to build a Priority Queue for the FrontierNodes so that we can
@@ -17,7 +17,7 @@ public class Node : IComparable<Node> //Interface
     public int xIndex = -1, yIndex = -1; //Track position in 2d Array -- set to flag an error if not set (-1 is invalid for arrays)
     public float distanceTravelled = Mathf.Infinity;//No useful value yet
     public Vector3 position; //Keeps track of Nodes position (no transform -- Monobehaviour)
-    public int priority;
+    public float priority;
 
     public List<Node> neighbors = new List<Node>();
 

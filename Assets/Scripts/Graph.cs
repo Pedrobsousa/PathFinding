@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
 
 
@@ -89,6 +90,12 @@ public class Graph : MonoBehaviour
             int newX = x + (int)dir.x;
             int newY = y + (int)dir.y;
 
+            //if(dir == directions[1] && CheckNeighbors())
+            //{
+            //    Debug.LogError("Diagonally " + dir);
+            //    continue;
+            //}
+
             if (IsWithinBounds(newX, newY) && nodeArray[newX, newY] != null &&
                 nodeArray[newX, newY].nodeType != NodeType.Blocked)
             {
@@ -98,6 +105,11 @@ public class Graph : MonoBehaviour
         return neighborNodes;
 
     }
+
+    //private bool CheckNeighbors()
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     List<Node> GetNeighbors(int x, int y)
     {
@@ -116,7 +128,7 @@ public class Graph : MonoBehaviour
         //Diagonal takes less steps but 1.4(distance btw Node diag) mov cost
         int diagonalSteps = min;
         int straightSteps = max - min;
-
+        //1.4 = distance btw 2 diagonal squares
         return (1.4f * diagonalSteps + straightSteps);
     }
 }

@@ -402,6 +402,7 @@ MonoBehaviour:
     type: 3}
   baseColor: {r: 1, g: 1, b: 1, a: 1}
   wallColor: {r: 0, g: 0, b: 0, a: 1}
+  liteTerrainColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &1881020449
 GameObject:
   m_ObjectHideFlags: 0
@@ -488,8 +489,8 @@ MonoBehaviour:
   pathColor: {r: 0, g: 0, b: 1, a: 1}
   exitOnGoal: 1
   isComplete: 0
-  showIterations: 1
-  showArrows: 1
+  showIterations: 0
+  showArrows: 0
   showColors: 1
 --- !u!4 &2063338569
 Transform:
