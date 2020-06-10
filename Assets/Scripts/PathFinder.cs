@@ -85,8 +85,8 @@ public class PathFinder : MonoBehaviour
                 }
 
                 //Dijkstra
-                ExpandFrontierDijkstra(currentNode);
-
+                //ExpandFrontierDijkstra(currentNode);
+                ExpandFrontierAstar(currentNode);
                 //When we find the goalNode get path
                 if (m_frontierNodes.Contains(m_goalNode))
                 {
@@ -171,8 +171,46 @@ public class PathFinder : MonoBehaviour
         }
     }
 
+    //Much like the Dij's we find the shortest path but 
+    //We improve the priority(Frontier Nodes) part of the algorithm 
+    //Using the heuristic function:
+    //F(node.priority) = G(.distanceTravelled) + H(m_graph.GetNodeDistance(node.neighbors[i], m_goalNode))
+    void ExpandFrontierAstar(Node node)
+    {
+        if (node != null)
+        {
+            for (int i = 0; i < node.neighbors.Count; i++)
+            {
+                if (!m_exploredNodes.Contains(node.neighbors[i]))
+                {
+                    //Distance between neighbor of the node                                         !!!
+                    float distanceToNeighbor = m_graph.GetNodeDistance(node, node.neighbors[i]);//Add move nodetype as move cost
+                    float newDistanceTravelled = distanceToNeighbor + node.distanceTravelled; //+ (int)node.nodeType;
 
+                    //Only if never travelled to(still has Infinity as distanceTravelled)
+                    //or the new distance travelled is shorter than the existing one in neighbor
+                    //Only re route the previous node to current if we found a shorter path
+                    if (float.IsPositiveInfinity(node.neighbors[i].distanceTravelled) ||
+                        newDistanceTravelled < node.neighbors[i].distanceTravelled)
+                    {
+                        node.neighbors[i].previous = node;
+                        node.neighbors[i].distanceTravelled = newDistanceTravelled;
 
+                    }
+
+                    if (!m_frontierNodes.Contains(node.neighbors[i]) && m_graph != null)
+                    {
+                        //This functions as our H
+                        float distanceToGoal = m_graph.GetNodeDistance(node.neighbors[i], m_goalNode);
+
+                        node.neighbors[i].priority = node.neighbors[i].distanceTravelled + distanceToGoal;
+                        m_frontierNodes.Enqueue(node.neighbors[i]);
+                    }
+
+                }
+            }
+        }
+    }
 
 
 

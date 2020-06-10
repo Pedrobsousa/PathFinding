@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   height: 5
   width: 10
-  textAsset: {fileID: 4900000, guid: 19f399440ec942f43a991677f0d19519, type: 3}
+  textAsset: {fileID: 4900000, guid: 16d30375197593a4ea001f53f4d97cfd, type: 3}
 --- !u!4 &83356670
 Transform:
   m_ObjectHideFlags: 0
@@ -489,8 +489,8 @@ MonoBehaviour:
   pathColor: {r: 0, g: 0, b: 1, a: 1}
   exitOnGoal: 1
   isComplete: 0
-  showIterations: 0
-  showArrows: 0
+  showIterations: 1
+  showArrows: 1
   showColors: 1
 --- !u!4 &2063338569
 Transform:
